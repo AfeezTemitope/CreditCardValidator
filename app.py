@@ -9,7 +9,7 @@ CORS(app)
 app.register_blueprint(validate_card_input)
 
 
-@app.route('/validate')
+@app.route('/')
 def hello_world():  # put application's code here
     return 'Hello World!'
 
