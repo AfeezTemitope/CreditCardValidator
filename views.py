@@ -1,8 +1,14 @@
 from flask import request, jsonify
 import re
 
-import re
-
+def luhn_check(card_number):
+    digits = [int(d) for d in card_number[::-1]]
+    for i in range(1, len(digits), 2):
+        digits[i] *= 2
+        if digits[i] > 9:
+            digits[i] -= 9
+    total = sum(digits)
+    return total % 10 == 0
 
 def validate_card(card_number):
     pattern = r"[-/.*?,@]"
@@ -38,8 +44,12 @@ def validate_card(card_number):
 
     return 'Unknown card type'
 
-
 def validate():
     card_number = request.json['card_number']
     card_type = validate_card(card_number)
-    return jsonify({'card_type': card_type})
+    cleaned_card_number = re.sub(r"[-/.*?,@]", '', card_number)
+    
+    if not luhn_check(cleaned_card_number):
+        return jsonify({'card_type': card_type, 'valid': False, 'message': 'Invalid card number according to Luhn algorithm'})
+    
+    return jsonify({'card_type': card_type, 'valid': True})
